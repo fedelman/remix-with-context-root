@@ -7,6 +7,9 @@ const { createRequestHandler } = require("@remix-run/express");
 const MODE = process.env.NODE_ENV;
 const BUILD_DIR = path.join(process.cwd(), "server/build");
 
+const root = express()
+const contextPath = process.env.CONTEXT_ROOT || '/'
+
 const app = express();
 app.use(compression());
 
@@ -29,9 +32,11 @@ app.all(
 );
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Express server listening on port ${port}`);
-});
+root.use(contextPath, app)
+console.log(`Context path: ${contextPath}`)
+const server = root.listen(port, () => {
+    console.log(`Listening at http://localhost:${port}${contextPath}`)
+})
 
 ////////////////////////////////////////////////////////////////////////////////
 function purgeRequireCache() {
